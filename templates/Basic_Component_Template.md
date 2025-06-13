@@ -33,14 +33,6 @@
 </style>
 ```
 
-## Example 1: Basic Template Selection
-### Task: Display User Avatar
-**Assessment**: 
-- Props: 2 (user, size) = 2 points
-- State: 1 (imageLoaded) = 2 points  
-- Events: 1 (onError) = 1 point
-- **Total: 5 points → BASIC template**
-
 **Context Loading**:
 - Template: component-basic.svelte
 - Patterns: svelte4-quick-reference.md
