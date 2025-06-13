@@ -28,7 +28,7 @@ Svelte's minimal syntax and explicit reactivity make it ideal for AI-assisted de
 ## Repository Structure
 
 ```
-svelte-vibe-coder/
+sveltevibecoder/
 ├── patterns/              # Core development patterns
 │   ├── svelte4-basics.md     # Fundamental Svelte 4 patterns
 │   ├── component-architecture.md
@@ -53,7 +53,7 @@ Add this repository to your existing Svelte project:
 
 ```bash
 # In your main project directory
-git submodule add https://github.com/tuvens/svelte-vibe-coder docs/vibe-coding
+git submodule add https://github.com/tuvens/sveltevibecoder docs/vibe-coding
 
 # Initialize the submodule
 git submodule update --init
@@ -67,8 +67,8 @@ git submodule update --init
 Clone the repository to use as a reference:
 
 ```bash
-git clone https://github.com/tuvens/svelte-vibe-coder
-cd svelte-vibe-coder
+git clone https://github.com/tuvens/sveltevibecoder
+cd sveltevibecoder
 ```
 
 ## Core Principles
