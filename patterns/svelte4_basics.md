@@ -1,389 +1,172 @@
-# Svelte 4 Basics for Vibe Coding
+# Svelte 4 Basics for Vibe Coding (Condensed)
 
-> Essential patterns and syntax for AI-assisted Svelte 4 development
+> Essential Svelte 4 patterns optimized for AI agent consumption
 
-## Core Reactive Patterns
+## Quick Syntax Reference
 
-### Variables and State
-```svelte
-<!-- src/components/Counter.svelte -->
-<script>
-  // Simple reactive variable (4 tokens)
-  let count = 0
-  
-  // Reactive assignment
-  let items = []
-  
-  // Props from parent (export let)
-  export let initialValue = 0
-  export let disabled = false
-</script>
-```
+| Pattern | Svelte 4 Syntax | Token Count | Use Case |
+|---------|----------------|-------------|----------|
+| Variable | `let count = 0` | 4 | Reactive state |
+| Computed | `$: doubled = count * 2` | 6 | Derived values |
+| Props | `export let user` | 3 | Component input |
+| Events | `on:click={handler}` | 3 | User interactions |
+| Binding | `bind:value={text}` | 3 | Two-way data |
+| Conditional | `{#if condition}` | 3 | Show/hide content |
+| Loop | `{#each items as item}` | 5 | Render lists |
+| Store | `$store` | 2 | Global state |
 
-### Computed Values (Reactive Statements)
+## Component Structure Template
+
 ```svelte
 <script>
-  let count = 0
-  
-  // Single computed value (6 tokens)
-  $: doubled = count * 2
-  
-  // Conditional computed value
-  $: isEven = count % 2 === 0
-  
-  // Complex computation
-  $: summary = {
-    count,
-    doubled,
-    status: count > 10 ? 'high' : 'low'
-  }
-  
-  // Dependent computation
-  $: squared = doubled * doubled
-</script>
-```
-
-### Side Effects
-```svelte
-<script>
-  let user = null
-  
-  // Simple side effect (8 tokens)
-  $: if (user) console.log('User loaded:', user.name)
-  
-  // Block syntax for multiple statements
-  $: {
-    if (user && user.preferences) {
-      document.title = `Welcome ${user.name}`
-      localStorage.setItem('lastUser', user.id)
-    }
-  }
-  
-  // Cleanup pattern
-  $: if (user) {
-    const cleanup = setupUserSession(user)
-    return cleanup
-  }
-</script>
-```
-
-## Component Structure (Token-Optimized)
-
-### Standard Component Layout
-```svelte
-<!-- src/components/UserCard.svelte -->
-<script>
-  // 1. Imports (if needed)
+  // 1. Imports
   import { createEventDispatcher } from 'svelte'
   
   // 2. Props
-  export let user
-  export let editable = false
+  export let data = []
+  export let disabled = false
   
   // 3. Local state
-  let editing = false
-  let changes = {}
+  let loading = false
   
   // 4. Event dispatcher
   const dispatch = createEventDispatcher()
   
   // 5. Reactive statements
-  $: hasChanges = Object.keys(changes).length > 0
-  $: canSave = hasChanges && user
+  $: isValid = data.length > 0 && !disabled
   
   // 6. Functions
-  function startEdit() {
-    editing = true
-    changes = { ...user }
-  }
-  
-  function saveChanges() {
-    dispatch('save', changes)
-    editing = false
+  function handleClick() {
+    dispatch('action', { data })
   }
 </script>
 
-<!-- 7. Template -->
-<div class="user-card">
-  <h3>{user.name}</h3>
-  
-  {#if editing}
-    <input bind:value={changes.name} />
-    <button on:click={saveChanges} disabled={!canSave}>Save</button>
+<div class="component">
+  {#if loading}
+    Loading...
   {:else}
-    <p>{user.email}</p>
-    {#if editable}
-      <button on:click={startEdit}>Edit</button>
-    {/if}
+    <button on:click={handleClick} {disabled}>
+      Action ({data.length})
+    </button>
   {/if}
 </div>
 
-<!-- 8. Styles -->
 <style>
-  .user-card {
-    padding: 1rem;
-    border: 1px solid #ccc;
-  }
+  .component { padding: 1rem; }
 </style>
 ```
 
-## Event Handling
+## Essential Patterns
 
-### Event Syntax (Svelte 4 ONLY)
+### Reactive Patterns
 ```svelte
 <script>
   let count = 0
   
-  function increment() {
-    count++
-  }
+  // Computed value
+  $: doubled = count * 2
   
-  function handleInput(event) {
-    console.log(event.target.value)
+  // Conditional computed
+  $: status = count > 10 ? 'high' : 'low'
+  
+  // Side effect
+  $: if (count > 0) console.log(count)
+  
+  // Block syntax for multiple statements
+  $: {
+    if (count > 5) {
+      document.title = `Count: ${count}`
+    }
   }
 </script>
-
-<!-- Correct Svelte 4 syntax -->
-<button on:click={increment}>+</button>
-<button on:click={() => count++}>+ Inline</button>
-<input on:input={handleInput} />
-
-<!-- WRONG: Svelte 5 syntax -->
-<!-- <button onclick={increment}>+</button> -->
 ```
 
-### Custom Events
+### Event Handling
 ```svelte
-<!-- Child component -->
 <script>
-  import { createEventDispatcher } from 'svelte'
+  let value = ''
   
-  const dispatch = createEventDispatcher()
-  
-  function notify() {
-    dispatch('message', {
-      text: 'Hello from child'
-    })
+  function handleSubmit() {
+    dispatch('submit', { value })
   }
 </script>
 
-<button on:click={notify}>Send Message</button>
+<!-- Event binding -->
+<button on:click={handleSubmit}>Submit</button>
+<button on:click={() => count++}>Increment</button>
+<input on:input={e => value = e.target.value} />
 
-<!-- Parent component -->
-<script>
-  function handleMessage(event) {
-    console.log(event.detail.text)
-  }
-</script>
-
-<ChildComponent on:message={handleMessage} />
+<!-- Event modifiers -->
+<form on:submit|preventDefault={handleSubmit}>
+<button on:click|once={handler}>Click Once</button>
 ```
 
-## Conditional Rendering
-
-### If Blocks
+### Conditional & Lists
 ```svelte
 <script>
   let user = null
-  let loading = false
+  let items = [{id: 1, name: 'Item'}]
 </script>
 
-<!-- Simple conditional -->
+<!-- Conditionals -->
 {#if user}
-  <p>Welcome {user.name}!</p>
-{/if}
-
-<!-- If-else -->
-{#if loading}
-  <p>Loading...</p>
-{:else if user}
-  <UserProfile {user} />
-{:else}
-  <LoginForm />
-{/if}
-
-<!-- Inline conditional (for simple cases) -->
-<p>{user ? `Welcome ${user.name}` : 'Please log in'}</p>
-```
-
-## List Rendering
-
-### Each Blocks
-```svelte
-<script>
-  let items = [
-    { id: 1, name: 'Apple' },
-    { id: 2, name: 'Banana' }
-  ]
-</script>
-
-<!-- Basic each loop -->
-{#each items as item}
-  <div>{item.name}</div>
-{/each}
-
-<!-- With index -->
-{#each items as item, i}
-  <div>{i + 1}. {item.name}</div>
-{/each}
-
-<!-- With key (important for performance) -->
-{#each items as item (item.id)}
-  <ItemCard {item} />
-{/each}
-
-<!-- With else (empty state) -->
-{#each items as item}
-  <div>{item.name}</div>
-{:else}
-  <p>No items found</p>
-{/each}
-```
-
-## Store Patterns
-
-### Writable Stores
-```svelte
-<!-- src/lib/stores.js -->
-import { writable } from 'svelte/store'
-
-export const user = writable(null)
-export const theme = writable('light')
-
-<!-- Component using store -->
-<script>
-  import { user } from '$lib/stores.js'
-  
-  // Auto-subscription with $
-  $: if ($user) {
-    console.log('User changed:', $user.name)
-  }
-  
-  function logout() {
-    user.set(null)
-  }
-</script>
-
-<p>Current user: {$user?.name || 'None'}</p>
-<button on:click={logout}>Logout</button>
-```
-
-### Derived Stores
-```svelte
-<!-- src/lib/stores.js -->
-import { writable, derived } from 'svelte/store'
-
-export const user = writable(null)
-export const isLoggedIn = derived(user, $user => !!$user)
-export const userName = derived(user, $user => $user?.name || 'Guest')
-
-<!-- Component -->
-<script>
-  import { isLoggedIn, userName } from '$lib/stores.js'
-</script>
-
-{#if $isLoggedIn}
-  <p>Hello {$userName}!</p>
+  <p>Hello {user.name}</p>
 {:else}
   <p>Please log in</p>
 {/if}
+
+<!-- Lists with key -->
+{#each items as item (item.id)}
+  <div>{item.name}</div>
+{:else}
+  <p>No items</p>
+{/each}
 ```
 
-## Form Handling
-
-### Two-Way Binding
+### Form Binding
 ```svelte
 <script>
   let formData = {
     name: '',
     email: '',
     age: 0,
-    newsletter: false
+    active: false
   }
   
   $: isValid = formData.name && formData.email
-  
-  function handleSubmit() {
-    if (isValid) {
-      console.log('Submitting:', formData)
-    }
-  }
 </script>
 
-<form on:submit|preventDefault={handleSubmit}>
-  <input 
-    bind:value={formData.name} 
-    placeholder="Name" 
-    required 
-  />
-  
-  <input 
-    type="email"
-    bind:value={formData.email} 
-    placeholder="Email" 
-    required 
-  />
-  
-  <input 
-    type="number"
-    bind:value={formData.age} 
-    min="0" 
-  />
-  
-  <label>
-    <input 
-      type="checkbox"
-      bind:checked={formData.newsletter} 
-    />
-    Subscribe to newsletter
-  </label>
-  
-  <button type="submit" disabled={!isValid}>
-    Submit
-  </button>
-</form>
+<input bind:value={formData.name} placeholder="Name" />
+<input type="email" bind:value={formData.email} />
+<input type="number" bind:value={formData.age} />
+<input type="checkbox" bind:checked={formData.active} />
+
+<button disabled={!isValid}>Submit</button>
 ```
 
-## Lifecycle Functions
-
-### Component Lifecycle
+### Store Usage
 ```svelte
+<!-- stores.js -->
 <script>
-  import { onMount, onDestroy, beforeUpdate, afterUpdate } from 'svelte'
+  import { writable, derived } from 'svelte/store'
   
-  let data = null
-  
-  // Runs after component first renders
-  onMount(async () => {
-    const response = await fetch('/api/data')
-    data = await response.json()
-    
-    // Return cleanup function
-    return () => {
-      console.log('Component unmounted')
-    }
-  })
-  
-  // Explicit cleanup
-  onDestroy(() => {
-    console.log('Cleaning up...')
-  })
-  
-  // Before DOM updates
-  beforeUpdate(() => {
-    console.log('About to update')
-  })
-  
-  // After DOM updates
-  afterUpdate(() => {
-    console.log('Updated')
-  })
+  export const user = writable(null)
+  export const isLoggedIn = derived(user, $user => !!$user)
 </script>
+
+<!-- Component -->
+<script>
+  import { user, isLoggedIn } from './stores.js'
+</script>
+
+{#if $isLoggedIn}
+  <p>Welcome {$user.name}</p>
+{/if}
+
+<button on:click={() => user.set(null)}>Logout</button>
 ```
 
-## Common Patterns for AI Agents
-
-### Token-Efficient Data Fetching
+### Lifecycle & Data Fetching
 ```svelte
 <script>
   import { onMount } from 'svelte'
@@ -394,7 +177,7 @@ export const userName = derived(user, $user => $user?.name || 'Guest')
   
   onMount(async () => {
     try {
-      const response = await fetch('/api/users')
+      const response = await fetch('/api/data')
       data = await response.json()
     } catch (e) {
       error = e.message
@@ -409,72 +192,118 @@ export const userName = derived(user, $user => $user?.name || 'Guest')
 {:else if error}
   Error: {error}
 {:else}
-  <UserList users={data} />
+  <DataDisplay {data} />
 {/if}
 ```
 
-### Reusable Component Pattern
+## Component Communication
+
+### Props & Events
 ```svelte
-<!-- src/components/Button.svelte -->
+<!-- Parent -->
 <script>
-  export let variant = 'primary'
-  export let disabled = false
-  export let loading = false
+  let selectedUser = null
   
-  $: classes = `btn btn-${variant}`
+  function handleUserSelect(event) {
+    selectedUser = event.detail.user
+  }
 </script>
 
-<button 
-  class={classes}
-  {disabled}
-  on:click
-  {...$$restProps}
->
-  {#if loading}
-    Loading...
-  {:else}
-    <slot />
-  {/if}
-</button>
+<UserCard 
+  user={selectedUser} 
+  editable={true}
+  on:select={handleUserSelect}
+  on:save={handleSave}
+/>
 
-<style>
-  .btn {
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
+<!-- Child: UserCard -->
+<script>
+  import { createEventDispatcher } from 'svelte'
   
-  .btn-primary {
-    background: blue;
-    color: white;
-  }
+  export let user
+  export let editable = false
   
-  .btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  const dispatch = createEventDispatcher()
+  
+  function selectUser() {
+    dispatch('select', { user })
   }
-</style>
+</script>
 ```
 
-## Critical Reminders for AI Agents
+### Slots
+```svelte
+<!-- Component with slots -->
+<div class="card">
+  <header>
+    <slot name="header">Default Header</slot>
+  </header>
+  <main>
+    <slot />
+  </main>
+  <footer>
+    <slot name="footer" {user}>
+      <button>Default Action</button>
+    </slot>
+  </footer>
+</div>
 
-### ✅ DO (Svelte 4)
-- Use `let variable = value` for reactive variables
-- Use `$: computed = expression` for computed values
-- Use `on:event={handler}` for event binding
-- Use `export let prop` for component props
-- Use `{#if}{:else}{/if}` for conditionals
-- Use `{#each items as item}{/each}` for loops
+<!-- Usage -->
+<Card>
+  <h1 slot="header">Custom Header</h1>
+  <p>Main content</p>
+  <div slot="footer" let:user>
+    <button>Action for {user.name}</button>
+  </div>
+</Card>
+```
 
-### ❌ AVOID (Svelte 5 syntax)
-- NO `$state()`, `$derived()`, `$effect()`
-- NO `onclick={}` event syntax
-- NO runes of any kind
+## Critical Rules for AI Agents
 
-### Token Optimization Tips
-- Prefer inline event handlers for simple actions
-- Use reactive statements over functions when possible
-- Keep component structure consistent
-- Use destructuring in each loops when helpful
+### ✅ ALWAYS Use (Svelte 4)
+- `let variable = value` for reactive variables
+- `$: computed = expression` for computed values
+- `on:event={handler}` for event binding
+- `export let prop` for component props
+- `{#if}{:else}{/if}` for conditionals
+- `{#each items as item (item.id)}{/each}` for loops
+
+### ❌ NEVER Use (Svelte 5)
+- `$state()`, `$derived()`, `$effect()` - These are Svelte 5 runes
+- `onclick={}` - Use `on:click={}` instead
+- Any rune syntax
+
+### Token Optimization
+- Prefer `$: doubled = count * 2` over function declarations
+- Use inline event handlers for simple actions: `on:click={() => count++}`
 - Combine related reactive statements when logical
+- Use destructuring in loops: `{#each users as {id, name}}`
+
+### Testing Essentials
+- Always add `data-testid` attributes for testing
+- Use consistent naming: `data-testid="component-name"`
+- Include test IDs for interactive elements
+
+```svelte
+<div data-testid="user-card">
+  <button data-testid="edit-button" on:click={edit}>Edit</button>
+  <span data-testid="user-name">{user.name}</span>
+</div>
+```
+
+### Performance Patterns
+- Use keyed each blocks: `{#each items as item (item.id)}`
+- Avoid creating functions in templates: `{#each items as item}<Button on:click={() => select(item)} />{/each}`
+- Prefer: `<Button on:click={selectItem} data-id={item.id} />`
+
+## Quick Troubleshooting
+
+| Issue | Cause | Fix |
+|-------|--------|-----|
+| Reactivity not working | Assignment issue | Use `items = items` after push/splice |
+| Events not firing | Wrong syntax | Use `on:event` not `onevent` |
+| Props undefined | Export missing | Add `export let propName` |
+| Store not reactive | Missing $ | Use `$store` not `store` |
+| Computed not updating | Not using $ | Use `$: computed = expression` |
+
+This condensed reference provides all essential Svelte 4 patterns needed for AI-assisted development in a token-efficient format.
