@@ -1,3 +1,4 @@
+```
 <!-- For simple, single-purpose components -->
 <script>
   // Props (1-3 simple props)
@@ -30,6 +31,7 @@
   .component { padding: 0.5rem; }
   .disabled { opacity: 0.5; }
 </style>
+```
 
 ## Example 1: Basic Template Selection
 ### Task: Display User Avatar
