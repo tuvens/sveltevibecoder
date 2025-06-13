@@ -1,313 +1,291 @@
-# TDD Pure Functions Pattern for Vibe Coding
+# TDD Pure Functions Pattern for Claude Code Agents
 
-> Documentation-driven development workflow for creating reliable, testable functions
+> Autonomous workflow for Claude Code to generate production-ready, tested utility functions
 
-## Core Workflow
+## Claude Code Autonomous Workflow
 
-### Step 1: Documentation First
-Write clear JSDoc documentation describing the function's purpose:
-
-```javascript
-/**
- * Extracts first and last name from a full name string
- * @param {string} fullName - Complete name string (e.g., "John Michael Smith")
- * @returns {Object} { firstName: string, lastName: string }
- * @throws {Error} When fullName is empty or invalid
- * 
- * @example
- * parseName("John Smith") // { firstName: "John", lastName: "Smith" }
- * parseName("Mary Jane Watson") // { firstName: "Mary", lastName: "Watson" }
- */
+### Command 1: Generate Documentation
+```bash
+claude code --task "document-function" --description "[function purpose]"
 ```
 
-### Step 2: Generate Tests
-Create comprehensive tests based on documentation:
+**Claude Code Process:**
+1. Create JSDoc specification with:
+   - Clear purpose statement
+   - Parameter types and validation
+   - Return type structure  
+   - Error conditions and throws
+   - Usage examples
+   - Pure function guarantee (no side effects)
 
+2. Save to: `src/lib/utils/[functionName].js` (documentation only)
+
+### Command 2: Generate Tests
+```bash
+claude code --task "generate-tests" --source "src/lib/utils/[functionName].js"
+```
+
+**Claude Code Process:**
+1. Read JSDoc documentation from source file
+2. Generate comprehensive test suite covering:
+   - All documented examples
+   - Edge cases and boundary conditions
+   - Error conditions and exception handling
+   - Type validation
+   - Return value structure validation
+
+3. Save to: `src/lib/utils/[functionName].test.js`
+4. Ensure 100% coverage of documented behavior
+
+### Command 3: Implement Function  
+```bash
+claude code --task "implement-function" --source "src/lib/utils/[functionName].js" --tests "src/lib/utils/[functionName].test.js"
+```
+
+**Claude Code Process:**
+1. Read JSDoc specification and test requirements
+2. Implement pure function that:
+   - Passes all tests
+   - Follows documentation exactly
+   - Has no side effects
+   - Includes proper error handling
+   - Optimizes for readability
+
+3. Update source file with implementation
+4. Run tests to verify 100% pass rate
+
+### Command 4: Validate and Document
+```bash
+claude code --task "validate-function" --source "src/lib/utils/[functionName].js"
+```
+
+**Claude Code Process:**
+1. Run test suite and verify 100% pass
+2. Run coverage analysis and verify 100% coverage
+3. Generate usage documentation
+4. Add to function index/exports
+5. Commit with standardized message
+
+## Implementation Templates for Claude Code
+
+### JSDoc Template Generator
+**Claude Code Internal Process:**
 ```javascript
-// src/utils/parseName.test.js
+// Template: src/lib/utils/[functionName].js
+/**
+ * [GENERATED: Function purpose from human description]
+ * @param {[TYPE]} [paramName] - [GENERATED: Parameter description]
+ * @returns {[TYPE]} [GENERATED: Return description with structure]
+ * @throws {Error} [GENERATED: Error conditions]
+ * 
+ * @example
+ * [GENERATED: Usage examples covering main use cases]
+ * 
+ * @pure This function has no side effects
+ * @coverage Target: 100%
+ */
+export function [functionName]([parameters]) {
+  // Implementation to be generated after tests
+}
+```
+
+### Test Template Generator  
+**Claude Code Internal Process:**
+```javascript
+// Template: src/lib/utils/[functionName].test.js
 import { describe, it, expect } from 'vitest'
-import { parseName } from './parseName.js'
+import { [functionName] } from './[functionName].js'
 
-describe('parseName', () => {
-  it('should parse simple two-part names', () => {
-    expect(parseName('John Smith')).toEqual({
-      firstName: 'John',
-      lastName: 'Smith'
-    })
+describe('[functionName]', () => {
+  // [GENERATED: Test cases from JSDoc examples]
+  it('[GENERATED: describes example behavior]', () => {
+    expect([functionName]([input])).toEqual([expectedOutput])
   })
 
-  it('should handle multi-part names by taking first and last', () => {
-    expect(parseName('Mary Jane Watson')).toEqual({
-      firstName: 'Mary',
-      lastName: 'Watson'
-    })
+  // [GENERATED: Edge case tests]
+  it('[GENERATED: describes edge case]', () => {
+    expect([functionName]([edgeInput])).toEqual([edgeOutput])
   })
 
-  it('should handle single names', () => {
-    expect(parseName('Madonna')).toEqual({
-      firstName: 'Madonna',
-      lastName: ''
-    })
+  // [GENERATED: Error condition tests]  
+  it('[GENERATED: describes error condition]', () => {
+    expect(() => [functionName]([invalidInput])).toThrow('[expectedError]')
   })
 
-  it('should throw error for empty input', () => {
-    expect(() => parseName('')).toThrow('Invalid name')
-    expect(() => parseName('   ')).toThrow('Invalid name')
-  })
-
-  it('should trim whitespace', () => {
-    expect(parseName('  John   Smith  ')).toEqual({
-      firstName: 'John',
-      lastName: 'Smith'
-    })
+  // [GENERATED: Type validation tests]
+  it('[GENERATED: validates input types]', () => {
+    expect(() => [functionName](null)).toThrow()
+    expect(() => [functionName](undefined)).toThrow()
   })
 })
 ```
 
-### Step 3: Implement Function
-Build function to satisfy all tests:
-
+### Implementation Pattern
+**Claude Code Internal Process:**
 ```javascript
-// src/utils/parseName.js
-/**
- * Extracts first and last name from a full name string
- * @param {string} fullName - Complete name string
- * @returns {Object} { firstName: string, lastName: string }
- * @throws {Error} When fullName is empty or invalid
- */
-export function parseName(fullName) {
-  if (!fullName || typeof fullName !== 'string' || !fullName.trim()) {
-    throw new Error('Invalid name: fullName must be a non-empty string')
+// Pattern: Pure function implementation
+export function [functionName]([parameters]) {
+  // 1. Input validation (from JSDoc @throws)
+  if ([validationCondition]) {
+    throw new Error('[errorMessage]')
   }
 
-  const parts = fullName.trim().split(/\s+/)
-  
-  if (parts.length === 1) {
-    return {
-      firstName: parts[0],
-      lastName: ''
-    }
-  }
-  
-  return {
-    firstName: parts[0],
-    lastName: parts[parts.length - 1]
-  }
+  // 2. Core logic (satisfies all test cases)
+  const result = [implementation]
+
+  // 3. Return (matches JSDoc @returns specification)
+  return result
 }
 ```
 
-## AI Agent Workflow
+## Quality Assurance Automation
 
-### Prompt Templates
+### Coverage Validation Process
+**Claude Code executes automatically:**
+```bash
+# Run tests and generate coverage report
+npm run test:coverage src/lib/utils/[functionName].test.js
 
-#### Step 1: Documentation Generation
-```markdown
-Write JSDoc documentation for a function that [describe purpose]:
+# Validate 100% coverage requirement
+if coverage < 100%:
+  identify_missing_branches()
+  generate_additional_tests()
+  re_run_until_100%
 
-Requirements:
-- Clear purpose description
-- Parameter types and descriptions  
-- Return type and structure
-- Error conditions
-- Usage examples
-- Pure function (no side effects)
+# Generate coverage badge for documentation
 ```
 
-#### Step 2: Test Generation
-```markdown
-Based on this JSDoc documentation, write comprehensive tests:
+### Integration Testing
+**Claude Code executes automatically:**
+```bash
+# Test function integration with existing codebase
+npm run test:integration -- --grep "[functionName]"
 
-[paste documentation]
+# Validate exports are properly configured
+check_exports_in_index_js()
 
-Requirements:
-- Test all documented behavior
-- Include edge cases and error conditions
-- Use Vitest testing framework
-- Aim for 100% coverage
-- Test examples from documentation
+# Validate TypeScript types if applicable  
+npm run type-check
 ```
 
-#### Step 3: Implementation
-```markdown
-Implement this function to pass all tests:
-
-Documentation:
-[paste JSDoc]
-
-Tests:
-[paste test file]
-
-Requirements:
-- Pure function (no side effects)
-- Passes all tests
-- Follows documentation exactly
-- Clean, readable implementation
+### Performance Benchmarking
+**Claude Code executes automatically:**
+```bash
+# Generate performance baseline for pure functions
+benchmark_function_performance()
+document_performance_characteristics()
+validate_no_side_effects()
 ```
 
-## Integration with Svelte Components
+## Svelte Component Integration Automation
 
-### Component Helper Functions
-```svelte
-<!-- src/components/UserCard.svelte -->
+### Component Helper Integration
+**Claude Code Process:**
+```javascript
+// Auto-generate component integration when utility is ready
+// Pattern: src/components/[ComponentName].svelte
+
 <script>
-  import { formatUserName, validateEmail } from '$lib/utils/userHelpers.js'
+  import { [functionName] } from '$lib/utils/[functionName].js'
   
-  export let user
+  export let [inputProp]
   
-  // Use pure functions for data transformation
-  $: displayName = formatUserName(user, { includeTitle: true })
-  $: emailValidation = validateEmail(user.email)
-  $: canEdit = user.permissions.includes('edit') && emailValidation.isValid
+  // Auto-generate reactive statement using new utility
+  $: [computedValue] = [functionName]([inputProp])
 </script>
 
-<div class="user-card">
-  <h3>{displayName}</h3>
-  {#if !emailValidation.isValid}
-    <span class="error">{emailValidation.error}</span>
-  {/if}
-</div>
+<!-- Template automatically integrates computed value -->
 ```
 
-### Utility Functions Library
-```javascript
-// src/lib/utils/userHelpers.js
+### Type Safety Integration  
+**Claude Code Process:**
+```typescript
+// Auto-generate TypeScript definitions
+// Pattern: src/lib/types/[functionName].d.ts
 
-/**
- * Formats user display name with optional title
- * @param {Object} user - User object with firstName, lastName, title
- * @param {Object} options - Formatting options
- * @param {boolean} options.includeTitle - Include professional title
- * @param {boolean} options.lastNameFirst - Format as "Last, First"
- * @returns {string} Formatted display name
- */
-export function formatUserName(user, options = {}) {
-  // Implementation follows tests
+export interface [FunctionName]Input {
+  [paramName]: [paramType]
 }
 
-/**
- * Validates email format and domain
- * @param {string} email - Email address to validate
- * @returns {Object} { isValid: boolean, error: string | null }
- */
-export function validateEmail(email) {
-  // Implementation follows tests
-}
-```
-
-## Storybook Integration
-
-### Component Stories with Function Documentation
-```javascript
-// src/components/UserCard.stories.js
-import UserCard from './UserCard.svelte'
-import { formatUserName } from '$lib/utils/userHelpers.js'
-
-export default {
-  title: 'Components/UserCard',
-  component: UserCard,
-  parameters: {
-    docs: {
-      description: {
-        component: 'User card component with helper functions for name formatting'
-      }
-    }
-  }
+export interface [FunctionName]Output {
+  [returnProperty]: [returnType]
 }
 
-// Document the helper functions used
-export const WithFormattedName = {
-  args: {
-    user: {
-      firstName: 'John',
-      lastName: 'Smith',
-      title: 'Dr.',
-      email: 'john@example.com'
-    }
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: `Uses formatUserName() helper: ${formatUserName.toString()}`
-      }
-    }
-  }
-}
+export declare function [functionName](
+  input: [FunctionName]Input
+): [FunctionName]Output
 ```
 
-## Quality Benefits
+## Agent Autonomy Requirements
 
-### Guaranteed Test Coverage
-Every function automatically has:
-- ✅ 100% code coverage
-- ✅ Edge case testing
-- ✅ Error condition handling
-- ✅ Documentation examples verified
+### Self-Directed Task Execution
+**Claude Code must autonomously:**
+1. **Parse human requirement** into clear function specification
+2. **Generate complete documentation** without human review
+3. **Create comprehensive test suite** covering all scenarios  
+4. **Implement working function** that passes all tests
+5. **Validate quality metrics** (coverage, performance, integration)
+6. **Update project structure** (exports, types, documentation)
+7. **Commit changes** with standardized messages
 
-### Predictable AI Behavior
-Pure functions are ideal for AI because:
-- No hidden dependencies
-- Predictable input/output
-- Easy to test and verify
-- Clear success criteria
+### Error Recovery Automation
+**Claude Code handles failures autonomously:**
+```bash
+# If tests fail during implementation
+analyze_test_failures()
+identify_implementation_gaps()
+regenerate_function_implementation()
+re_run_tests_until_pass()
 
-### Maintainable Code
-Documentation-driven approach ensures:
-- Clear function purpose
-- Explicit contracts
-- Usage examples
-- Error handling
+# If coverage is incomplete  
+identify_uncovered_branches()
+generate_additional_test_cases()
+verify_100_percent_coverage()
 
-## Agent Instructions Update
-
-### For Junior Backend Agent
-```markdown
-## Pure Function Development
-For all utility functions, follow TDD workflow:
-
-1. Write JSDoc documentation first
-2. Generate comprehensive tests
-3. Implement function to pass tests
-4. Verify 100% coverage
-
-Always prefer pure functions over stateful operations.
-Move side effects (DB, API, file system) to service layer.
+# If integration fails
+check_export_configuration()
+validate_import_paths()
+fix_integration_issues()
 ```
 
-### For Junior Frontend Agent  
-```markdown
-## Component Helper Functions
-Extract complex logic into pure functions:
+### Documentation Generation
+**Claude Code automatically generates:**
+- Function usage examples in project README
+- API documentation with generated examples
+- Integration guides for components using the function
+- Performance characteristics and benchmarks
+- Troubleshooting guides for common usage errors
 
-1. Document function purpose with JSDoc
-2. Create tests in adjacent .test.js file
-3. Implement pure function
-4. Use function in component reactive statements
+## Production Readiness Checklist
 
-Keep components focused on rendering and user interaction.
-Move data transformation to pure helper functions.
+**Claude Code validates automatically:**
+- [ ] Function passes 100% of generated tests
+- [ ] Code coverage at 100%
+- [ ] No side effects detected (pure function validation)
+- [ ] TypeScript types generated and validated
+- [ ] Performance benchmarks within acceptable range
+- [ ] Integration tests with existing components pass
+- [ ] Documentation generated and validated
+- [ ] Export configuration updated
+- [ ] Git commit with standardized message
+- [ ] Ready for production deployment
+
+## Example Complete Workflow
+
+### Human Input
+```bash
+claude code --create-function "Extract first and last name from full name string"
 ```
 
-## Example Agent Interaction
+### Claude Code Autonomous Execution
+1. **Generate JSDoc** specification for parseName function
+2. **Create test suite** with 15+ test cases covering edge cases
+3. **Implement function** that passes all tests
+4. **Validate 100% coverage** and performance benchmarks
+5. **Update exports** in src/lib/utils/index.js
+6. **Generate TypeScript types** if project uses TS
+7. **Create usage documentation** and examples
+8. **Commit changes** with message: "feat(utils): add parseName function with 100% test coverage"
 
-```markdown
-**Human**: Create a function to calculate user's age from birthdate
-
-**Agent Step 1**: 
-```javascript
-/**
- * Calculates user's current age from birthdate
- * @param {string|Date} birthdate - User's birth date
- * @param {Date} [currentDate=new Date()] - Reference date for calculation
- * @returns {number} Age in years
- * @throws {Error} When birthdate is invalid or in the future
- */
-```
-
-**Agent Step 2**: [Generates comprehensive tests]
-
-**Agent Step 3**: [Implements function to pass all tests]
-
-**Result**: Fully documented, tested, working function with 100% coverage
-```
-
-This workflow transforms function development from "hope it works" to "guaranteed to work" while being perfect for AI-assisted development.
+### Deliverable
+Production-ready, tested, documented utility function integrated into project structure without any human intervention required.
