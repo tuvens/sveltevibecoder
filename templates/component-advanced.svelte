@@ -1,4 +1,3 @@
-```
 <!-- For complex, multi-concern components -->
 <script>
   import { createEventDispatcher, onMount } from 'svelte'
@@ -111,4 +110,3 @@
     justify-content: flex-end;
   }
 </style>
-```
