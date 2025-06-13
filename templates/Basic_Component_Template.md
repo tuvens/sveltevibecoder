@@ -32,8 +32,3 @@
   .disabled { opacity: 0.5; }
 </style>
 ```
-
-**Context Loading**:
-- Template: component-basic.svelte
-- Patterns: svelte4-quick-reference.md
-- **Token usage**: ~25 tokens
