@@ -1,0 +1,333 @@
+<!-- src/components/ComponentName.svelte -->
+<!-- 
+  Component: [ComponentName]
+  Purpose: [Single sentence describing what this component does]
+  Author: [Developer name] with Claude assistance
+  Date: [YYYY-MM-DD]
+-->
+
+<script>
+  // 1. IMPORTS
+  import { createEventDispatcher } from 'svelte'
+  // import OtherComponent from './OtherComponent.svelte'
+  
+  // 2. EXPORTS (Props)
+  export let required_prop = undefined  // Required prop, no default
+  export let optional_prop = 'default'  // Optional prop with default
+  export let data = []                  // Array/object props
+  export let disabled = false          // Boolean props
+  export let variant = 'primary'       // String props with variants
+  
+  // 3. EVENT DISPATCHER
+  const dispatch = createEventDispatcher()
+  
+  // 4. LOCAL STATE
+  let internal_state = null
+  let is_loading = false
+  let user_input = ''
+  
+  // 5. REACTIVE STATEMENTS
+  // Computed values
+  $: computed_value = required_prop ? transform(required_prop) : null
+  $: is_valid = user_input.length > 0 && !disabled
+  $: css_classes = `component-base ${variant} ${disabled ? 'disabled' : ''}`
+  
+  // Side effects
+  $: if (required_prop) {
+    console.log('Prop changed:', required_prop)
+  }
+  
+  // 6. FUNCTIONS
+  function handle_click() {
+    if (disabled) return
+    
+    dispatch('click', { 
+      value: user_input,
+      timestamp: Date.now() 
+    })
+  }
+  
+  function handle_input(event) {
+    user_input = event.target.value
+    dispatch('input', { value: user_input })
+  }
+  
+  async function handle_async_action() {
+    try {
+      is_loading = true
+      const result = await some_async_operation()
+      dispatch('success', { result })
+    } catch (error) {
+      dispatch('error', { error: error.message })
+    } finally {
+      is_loading = false
+    }
+  }
+  
+  // Helper functions
+  function transform(value) {
+    return value.toString().toUpperCase()
+  }
+  
+  // 7. LIFECYCLE (if needed)
+  // import { onMount, onDestroy } from 'svelte'
+  // 
+  // onMount(() => {
+  //   console.log('Component mounted')
+  // })
+</script>
+
+<!-- 8. TEMPLATE -->
+<div 
+  class={css_classes}
+  data-testid="component-name"
+  data-variant={variant}
+>
+  <!-- Header/title section -->
+  {#if required_prop}
+    <header class="component-header">
+      <h3>{computed_value}</h3>
+      {#if optional_prop !== 'default'}
+        <span class="subtitle">{optional_prop}</span>
+      {/if}
+    </header>
+  {/if}
+  
+  <!-- Main content -->
+  <main class="component-content">
+    <!-- Conditional rendering -->
+    {#if is_loading}
+      <div class="loading" data-testid="loading">
+        Loading...
+      </div>
+    {:else if data.length > 0}
+      <!-- List rendering -->
+      <ul class="data-list">
+        {#each data as item, index (item.id || index)}
+          <li class="data-item">
+            <slot name="item" {item} {index}>
+              <!-- Default item template -->
+              <span>{item.name || item}</span>
+            </slot>
+          </li>
+        {/each}
+      </ul>
+    {:else}
+      <!-- Empty state -->
+      <div class="empty-state" data-testid="empty">
+        <slot name="empty">
+          <p>No data available</p>
+        </slot>
+      </div>
+    {/if}
+    
+    <!-- Form inputs (if applicable) -->
+    <div class="input-section">
+      <input
+        type="text"
+        bind:value={user_input}
+        on:input={handle_input}
+        placeholder="Enter value..."
+        {disabled}
+        data-testid="input"
+      />
+    </div>
+  </main>
+  
+  <!-- Footer/actions -->
+  <footer class="component-actions">
+    <button
+      on:click={handle_click}
+      disabled={!is_valid}
+      data-testid="primary-action"
+    >
+      {#if is_loading}
+        Processing...
+      {:else}
+        Primary Action
+      {/if}
+    </button>
+    
+    <button
+      on:click={handle_async_action}
+      disabled={disabled || is_loading}
+      data-testid="secondary-action"
+    >
+      Async Action
+    </button>
+  </footer>
+  
+  <!-- Default slot for additional content -->
+  <div class="additional-content">
+    <slot />
+  </div>
+</div>
+
+<!-- 9. STYLES -->
+<style>
+  /* Component base styles */
+  .component-base {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 4px;
+    border: 1px solid var(--border-color, #e0e0e0);
+    background: var(--bg-color, white);
+  }
+  
+  /* Variant styles */
+  .primary {
+    border-color: var(--primary-color, blue);
+  }
+  
+  .secondary {
+    border-color: var(--secondary-color, gray);
+  }
+  
+  /* State styles */
+  .disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  
+  /* Layout sections */
+  .component-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border-color, #e0e0e0);
+    padding-bottom: 0.5rem;
+  }
+  
+  .component-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+  
+  .subtitle {
+    font-size: 0.875rem;
+    color: var(--text-muted, #666);
+  }
+  
+  .component-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .component-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border-color, #e0e0e0);
+  }
+  
+  /* Content styles */
+  .loading {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted, #666);
+  }
+  
+  .data-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .data-item {
+    padding: 0.5rem;
+    background: var(--item-bg, #f9f9f9);
+    border-radius: 2px;
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted, #666);
+  }
+  
+  .input-section {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .input-section input {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 4px;
+  }
+  
+  .input-section input:focus {
+    outline: none;
+    border-color: var(--primary-color, blue);
+    box-shadow: 0 0 0 2px var(--primary-color, blue)20;
+  }
+  
+  /* Button styles */
+  button {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 4px;
+    background: var(--button-bg, white);
+    color: var(--button-color, black);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  button:hover:not(:disabled) {
+    background: var(--button-hover-bg, #f0f0f0);
+  }
+  
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  button[data-testid="primary-action"] {
+    background: var(--primary-color, blue);
+    color: white;
+    border-color: var(--primary-color, blue);
+  }
+  
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .component-base {
+      padding: 0.75rem;
+    }
+    
+    .component-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+    }
+    
+    .component-actions {
+      flex-direction: column;
+    }
+    
+    .input-section {
+      flex-direction: column;
+    }
+  }
+  
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    .component-base {
+      --bg-color: #1a1a1a;
+      --border-color: #333;
+      --text-muted: #999;
+      --button-bg: #333;
+      --button-color: white;
+      --button-hover-bg: #444;
+      --item-bg: #222;
+    }
+  }
+</style>
